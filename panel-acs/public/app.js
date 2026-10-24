@@ -35,8 +35,37 @@ const countWarning = document.getElementById('countWarning');
 let hotspotData = { count: 0, connected: false, users: [], error: '' };
 let hotspotSearchQuery = '';
 
+// =============================================
+// Theme Switcher (Dark Mode & Light Mode)
+// =============================================
+function initTheme() {
+  const savedTheme = localStorage.getItem('kurtech_theme') || 'dark';
+  applyTheme(savedTheme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('kurtech_theme', theme);
+  const icon = document.getElementById('themeIcon');
+  const text = document.getElementById('themeText');
+  if (theme === 'light') {
+    if (icon) icon.textContent = '🌙';
+    if (text) text.textContent = 'Gelap';
+  } else {
+    if (icon) icon.textContent = '☀️';
+    if (text) text.textContent = 'Terang';
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  applyTheme(newTheme);
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   checkAuth();
   fetchBrandConfig();
   fetchDevices();
@@ -957,15 +986,19 @@ async function fetchHotspotData(isManual = false) {
     hotspotData = data;
 
     if (data.connected) {
-      statHotspot.textContent = data.count || 0;
-      hotspotDot.className = 'badge-status-dot dot-green';
-      hotspotDot.title = 'Terhubung ke MikroTik';
-      hotspotSubtext.textContent = 'Live di MikroTik';
+      if (statHotspot) statHotspot.textContent = data.count || 0;
+      if (hotspotDot) {
+        hotspotDot.className = 'badge-status-dot dot-green';
+        hotspotDot.title = 'Terhubung ke MikroTik';
+      }
+      if (hotspotSubtext) hotspotSubtext.textContent = 'Live di MikroTik';
     } else {
-      statHotspot.textContent = '0';
-      hotspotDot.className = 'badge-status-dot dot-yellow';
-      hotspotDot.title = data.error || 'Belum Terhubung';
-      hotspotSubtext.textContent = 'Klik hubungkan';
+      if (statHotspot) statHotspot.textContent = '0';
+      if (hotspotDot) {
+        hotspotDot.className = 'badge-status-dot dot-yellow';
+        hotspotDot.title = data.error || 'Belum Terhubung';
+      }
+      if (hotspotSubtext) hotspotSubtext.textContent = 'Klik hubungkan';
     }
 
     // Update modal if open
@@ -982,8 +1015,8 @@ async function fetchHotspotData(isManual = false) {
     }
   } catch (err) {
     console.error('Fetch hotspot error:', err);
-    hotspotDot.className = 'badge-status-dot dot-red';
-    hotspotSubtext.textContent = 'Gagal memuat';
+    if (hotspotDot) hotspotDot.className = 'badge-status-dot dot-red';
+    if (hotspotSubtext) hotspotSubtext.textContent = 'Gagal memuat';
   }
 }
 
