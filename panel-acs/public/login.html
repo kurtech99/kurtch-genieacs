@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Administrator — NOC TR-069 Panel (by Kurtech)</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.3">
+  <style>
+    /* Specialized Login Page Styles */
+    body.login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 30%, #0d1527 0%, #070a12 100%);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      animation: loginFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes loginFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .login-card {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 38px 34px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                  0 0 30px -5px rgba(0, 242, 254, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0070f3, #00f2fe, #7928ca);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-logo {
+      height: 64px;
+      max-width: 180px;
+      object-fit: contain;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 6px 16px rgba(0, 242, 254, 0.3));
+    }
+
+    .login-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .login-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(0, 242, 254, 0.12);
+      color: var(--primary-cyan);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .input-field-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 13px 14px 13px 44px;
+      background: rgba(10, 14, 23, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--primary-cyan);
+      background: rgba(10, 14, 23, 0.9);
+      box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.18);
+    }
+
+    .input-wrapper input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      color: var(--primary-cyan);
+    }
+
+    .btn-toggle-eye {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color 0.2s;
+    }
+
+    .btn-toggle-eye:hover {
+      color: var(--text-main);
+    }
+
+    .btn-login {
+      margin-top: 8px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 16px rgba(0, 112, 243, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(0, 198, 255, 0.5);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      animation: alertSlide 0.3s ease;
+    }
+
+    .login-alert.show {
+      display: flex;
+    }
+
+    .login-alert.alert-error {
+      background: rgba(255, 51, 102, 0.15);
+      border: 1px solid rgba(255, 51, 102, 0.4);
+      color: #ff6b8b;
+    }
+
+    .login-alert.alert-success {
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid rgba(0, 230, 118, 0.4);
+      color: #4ade80;
+    }
+
+    @keyframes alertSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-footer-info {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .login-footer-info code {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #93c5fd;
+      font-family: var(--font-mono);
+    }
+
+    /* Shake animation on invalid attempt */
+    .shake-error {
+      animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+  </style>
+</head>
+<body class="login-page">
+
+  <!-- Glowing Cyber Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="login-container">
+    <div class="login-card" id="loginCard">
+      <div class="login-header">
+        <img src="logo.png" alt="Logo" class="login-logo" id="loginLogo" onerror="this.style.display='none'">
+        <h1 class="login-title" id="loginBrandName">NOC PANEL</h1>
+        <div class="login-subtitle">
+          <span>TR-069 Management</span>
+          <span class="login-badge" id="loginBrandBadge">by Kurtech</span>
+        </div>
+      </div>
+
+      <!-- Alert Box -->
+      <div class="login-alert alert-error" id="loginAlert">
+        <span id="alertIcon">⚠️</span>
+        <span id="alertMsg">Username atau password salah!</span>
+      </div>
+
+      <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+        <div class="input-field-group">
+          <label for="usernameInput">Username Administrator</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="usernameInput" required autocomplete="username" placeholder="Masukkan username" autofocus>
+          </div>
+        </div>
+
+        <div class="input-field-group">
+          <label for="passwordInput">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="passwordInput" required autocomplete="current-password" placeholder="Masukkan password">
+            <button type="button" class="btn-toggle-eye" onclick="togglePassVisibility()" title="Lihat / Sembunyikan Password">
+              <span id="eyeIcon">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="btnLogin">
+          <span id="btnLoginText">Masuk ke Panel NOC</span>
+        </button>
+      </form>
+
+      <div class="login-footer-info">
+        <p>Default: <code>admin</code> / <code>admin</code></p>
+        <p style="margin-top: 4px; font-size: 0.72rem; color: rgba(255,255,255,0.4);">
+          TR-069 & Hotspot System • by Kurtech
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch Brand Identity
+    async function loadBrand() {
+      try {
+        const res = await fetch('/api/brand/config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.brand) {
+            if (data.brand.name) document.getElementById('loginBrandName').textContent = data.brand.name;
+            if (data.brand.badge) document.getElementById('loginBrandBadge').textContent = data.brand.badge;
+            if (data.brand.logo) {
+              const logo = document.getElementById('loginLogo');
+              logo.src = data.brand.logo;
+              logo.style.display = 'inline-block';
+            }
+          }
+        }
+      } catch (e) {
+        // Fallback default
+      }
+    }
+
+    function togglePassVisibility() {
+      const input = document.getElementById('passwordInput');
+      const eye = document.getElementById('eyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.textContent = '🔒';
+      } else {
+        input.type = 'password';
+        eye.textContent = '👁️';
+      }
+    }
+
+    function showAlert(msg, isSuccess = false) {
+      const alert = document.getElementById('loginAlert');
+      const icon = document.getElementById('alertIcon');
+      const text = document.getElementById('alertMsg');
+      
+      alert.className = `login-alert show ${isSuccess ? 'alert-success' : 'alert-error'}`;
+      icon.textContent = isSuccess ? '✅' : '⚠️';
+      text.textContent = msg;
+
+      if (!isSuccess) {
+        const card = document.getElementById('loginCard');
+        card.classList.remove('shake-error');
+        void card.offsetWidth; // trigger reflow
+        card.classList.add('shake-error');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('btnLogin');
+      const btnText = document.getElementById('btnLoginText');
+
+      if (!username || !password) {
+        showAlert('Silakan isi username dan password!');
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spin-icon">🔄</span> Memverifikasi...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          showAlert('Login berhasil! Mengalihkan ke dashboard...', true);
+          btnText.textContent = 'Berhasil!';
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 600);
+        } else {
+          showAlert(data.message || 'Username atau password salah!');
+          btn.disabled = false;
+          btnText.textContent = 'Masuk ke Panel NOC';
+          document.getElementById('passwordInput').value = '';
+          document.getElementById('passwordInput').focus();
+        }
+      } catch (err) {
+        showAlert('Terjadi kesalahan jaringan atau server tidak merespon!');
+        btn.disabled = false;
+        btnText.textContent = 'Masuk ke Panel NOC';
+      }
+    }
+
+    // Auto-check if already logged in
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            window.location.href = '/';
+          }
+        }
+      } catch (e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadBrand();
+    });
+  </script>
+</body>
+</html>

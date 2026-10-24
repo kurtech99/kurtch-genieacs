@@ -1,0 +1,23 @@
+{
+  "name": "panel-acs",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "genieacs",
+    "tr069",
+    "acs",
+    "panel"
+  ],
+  "author": "Kurtech",
+  "license": "ISC",
+  "description": "GenieACS TR-069 NOC Web Panel & WhatsApp Bot (by Kurtech)",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "exceljs": "^4.4.0",
+    "pino": "^8.19.0",
+    "qrcode": "^1.5.4"
+  }
+}

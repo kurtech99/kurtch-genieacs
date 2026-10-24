@@ -1,0 +1,64 @@
+==============================================================================
+   🚀 INSTALLER GENIEACS TR-069 + NOC WEB PANEL (BY KURTECH)
+   📱 KOMPATIBEL: STB ARMBIAN (DHCP MIKROTIK), PROXMOX VE, & CLOUD VPS
+==============================================================================
+
+Folder ini dirancang khusus untuk Anda yang ingin menjalankan server GenieACS dan 
+Panel NOC di perangkat hemat daya (seperti STB Bekas Android B860H/HG680P) 
+atau di Virtual Machine Proxmox / VPS Cloud.
+
+------------------------------------------------------------------------------
+CARA CEPAT INSTALASI DI STB ARMBIAN (DAPAT IP DHCP DARI MIKROTIK):
+------------------------------------------------------------------------------
+1. Hubungkan port LAN STB ke salah satu port LAN MikroTik Anda menggunakan kabel UTP.
+2. Buka Winbox MikroTik -> Menu "IP" -> "DHCP Server" -> Tab "Leases".
+   - Cari perangkat STB (HostName: armbian).
+   - Klik kanan -> Pilih "Make Static" (agar IP STB tidak berubah saat mati lampu).
+   - Catat IP STB tersebut (contoh: 192.168.1.250).
+
+3. Salin folder "LINUX-STB-PROXMOX-VPS" ini ke dalam STB Anda menggunakan WinSCP:
+   - Host Name : Masukkan IP STB Anda (contoh: 192.168.1.250)
+   - Port      : 22
+   - User Name : root
+   - Password  : Sandi root STB Anda (default biasanya: 1234)
+   - Salin folder ini ke direktori /root/
+
+4. Buka PuTTY atau Terminal Windows (PowerShell/CMD):
+   - Ketik: ssh root@192.168.1.250
+   - Masuk ke folder installer:
+     cd /root/LINUX-STB-PROXMOX-VPS
+   - Berikan izin eksekusi:
+     chmod +x install.sh
+   - Jalankan installer:
+     bash install.sh
+
+5. Selesai! Script akan otomatis memasang:
+   - Node.js v20 LTS
+   - MongoDB Database
+   - GenieACS Core v1.2.9
+   - Import Virtual Parameters Kurtech (Redaman, PON, Suhu, Uptime)
+   - NOC Web Panel & WhatsApp Bot (by Kurtech)
+   - Mendaftarkan auto-start on boot di Linux (systemd).
+
+* CATATAN (JIKA DI SERVER/PROXMOX SUDAH ADA GENIEACS SEBELUMNYA):
+  Gunakan script khusus: bash install-panel-only.sh
+  Script ini HANYA memasang panel NOC & bot WhatsApp tanpa menghapus
+  data modem yang sudah ada di database GenieACS Anda.
+
+------------------------------------------------------------------------------
+AKSES SETELAH TERPASANG:
+------------------------------------------------------------------------------
+- NOC Web Panel (by Kurtech) : http://IP_STB:3300  (User: admin | Pass: admin)
+- GenieACS UI Resmi         : http://IP_STB:3000  (User: admin | Pass: admin)
+- TR-069 Inform URL         : http://IP_STB:7547/ (Diisi di modem ONT pelanggan)
+
+------------------------------------------------------------------------------
+PERINTAH PRAKTIS DI TERMINAL LINUX:
+------------------------------------------------------------------------------
+- Cek status layanan : acs-status
+- Restart layanan    : acs-restart
+- Lihat log WhatsApp : journalctl -u panel-acs -f
+
+Panduan lengkap bergambar dan panduan Proxmox / VPS silakan baca file:
+PANDUAN-INSTALL-STB-PROXMOX-VPS.md
+==============================================================================

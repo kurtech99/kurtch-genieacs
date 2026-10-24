@@ -1,0 +1,19 @@
+{
+  "brand": {
+    "name": "NOC PANEL",
+    "badge": "TR-069 & Hotspot • by Kurtech",
+    "logo": "logo.png"
+  },
+  "auth": {
+    "enabled": true,
+    "username": "admin",
+    "password": "admin"
+  },
+  "mikrotik": {
+    "host": "192.168.88.1",
+    "port": 8728,
+    "user": "admin",
+    "password": "",
+    "timeout": 4000
+  }
+}

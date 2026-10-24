@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOC TR-069 Panel — by Kurtech</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.6">
+</head>
+<body>
+  <!-- Background Glow Effects -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <img src="logo.png" alt="Logo" class="brand-logo" id="headerLogo" onclick="openHotspotModal('brand')" title="Klik untuk ganti nama brand & logo" style="cursor: pointer;">
+      <div class="brand-title">
+        <span class="brand-badge" id="headerBadge">TR-069 & Hotspot</span>
+        <span class="system-status"><span class="dot-live"></span> <span id="headerBrandName">NOC PANEL</span> <span style="font-size:0.75rem; color:#60a5fa; font-weight:600; margin-left:4px;">by Kurtech</span></span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="clock-box" id="liveClock">00:00:00</div>
+      <a href="support.html" target="_blank" class="btn btn-coffee" title="Dukung & Traktir Kopi Pengembangan Kurtech">
+        ☕ <span>Traktir Kopi</span>
+      </a>
+      <button type="button" class="btn btn-secondary" onclick="window.open('http://' + window.location.hostname + ':3000', '_blank')" title="Buka Dashboard Asli GenieACS (Port 3000)">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <span>GenieACS UI</span>
+      </button>
+      <button class="btn btn-secondary" onclick="openHotspotModal('brand')" title="Pengaturan Brand, Logo, Akun & MikroTik">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span>Pengaturan</span>
+      </button>
+      <div class="user-profile-badge" title="Login sebagai Administrator">
+        <span class="user-avatar">👤</span>
+        <span id="currentAdminName" style="font-weight: 600; font-size: 0.85rem; color: #93c5fd;">admin</span>
+      </div>
+      <button type="button" class="btn-danger-soft" onclick="handleLogout()" title="Keluar dari Panel">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        <span>Keluar</span>
+      </button>
+      <button class="btn btn-refresh" id="btnReload" title="Muat Ulang Data">
+        <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        <span>Refresh Data</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Stat Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-blue">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M4 6h16v10H4z M20 18H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zm-8 1h4v2h-4z"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Total Modem ONT</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-green">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Online Sekarang</div>
+          <div class="stat-value color-green" id="statOnline">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-red">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">Offline / Mati</div>
+          <div class="stat-value color-red" id="statOffline">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-clickable" id="hotspotCard" onclick="openHotspotModal()" title="Klik untuk lihat user voucher atau atur MikroTik">
+        <div class="stat-icon icon-cyan">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.21 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.79-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.33 4 15.86 4 13c0-4.41 3.59-8 8-8s8 3.59 8 8c0 2.86-1.61 5.33-3.99 6.92l1 1.73C19.99 19.92 22 16.7 22 13c0-5.52-4.48-10-10-10z"/></svg>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">
+            User Hotspot Aktif
+            <span class="badge-status-dot dot-yellow" id="hotspotDot" title="Status MikroTik"></span>
+          </div>
+          <div class="stat-value color-cyan" id="statHotspot">0</div>
+          <div class="stat-subtext" id="hotspotSubtext">Memuat...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar / Search & Filter -->
+    <section class="toolbar-box">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari pelanggan (Nama, No WhatsApp, PPPoE, SSID, SN, IP)..." autocomplete="off">
+      </div>
+
+      <div class="filter-pills">
+        <button class="pill active" data-filter="all">Semua (<span id="countAll">0</span>)</button>
+        <button class="pill pill-online" data-filter="online">Online (<span id="countOnline">0</span>)</button>
+        <button class="pill pill-offline" data-filter="offline">Offline (<span id="countOffline">0</span>)</button>
+        <button class="pill pill-warning" data-filter="warning">Redaman Jelek (<span id="countWarning">0</span>)</button>
+      </div>
+
+      <div class="toolbar-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnToggleAllPass" onclick="toggleAllPasswords()" title="Lihat atau sembunyikan semua sandi WiFi pelanggan di tabel">
+          <span id="toggleAllPassIcon">👁️</span> <span id="toggleAllPassText">Tampilkan Sandi</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnExportCsv" onclick="exportDevicesCsv()" title="Unduh semua data modem pelanggan ke file Excel/CSV">
+          <span>📥</span> <span>Export Excel</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Devices Table Area -->
+    <section class="table-container">
+      <div class="table-responsive">
+        <table class="devices-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Nama Pelanggan</th>
+              <th>SSID Wi-Fi</th>
+              <th>Password Wi-Fi</th>
+              <th>Redaman (RX)</th>
+              <th>Suhu / Uptime</th>
+              <th>IP PPPoE</th>
+              <th>Tipe ONT</th>
+              <th>HP Konek</th>
+              <th style="text-align: right;">Aksi Cepat</th>
+            </tr>
+          </thead>
+          <tbody id="devicesTableBody">
+            <tr>
+              <td colspan="10" class="loading-state">
+                <div class="spinner"></div>
+                <p>Memuat daftar perangkat modem...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Ganti WiFi (SSID & Password) -->
+  <div class="modal-backdrop" id="wifiModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-blue">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 3C6.95 3 3.15 4.85 0 7.23L12 22 24 7.25C20.85 4.87 17.05 3 12 3z"/></svg>
+          </div>
+          <div>
+            <h3>Ganti Wi-Fi Pelanggan</h3>
+            <p id="wifiModalTarget">Target: Pelanggan</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('wifiModal')">&times;</button>
+      </div>
+
+      <form id="wifiForm" onsubmit="submitWifiChange(event)">
+        <input type="hidden" id="wifiDeviceId">
+        
+        <div class="form-group">
+          <label>Nama Wi-Fi (SSID)</label>
+          <input type="text" id="wifiSsidInput" required placeholder="Contoh: ARKA-WIFI-AULIA">
+        </div>
+
+        <div class="form-group">
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Password Baru Wi-Fi</span>
+            <span style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">(Opsional — jika pakai sandi lama modem)</span>
+          </label>
+          <div class="password-input-wrap">
+            <input type="password" id="wifiPasswordInput" placeholder="Kosongkan jika sandi lama / tidak diubah">
+            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('wifiPasswordInput', this)" title="Lihat/Sembunyikan">
+              👁️
+            </button>
+          </div>
+          <div class="field-actions" style="margin-top: 6px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.74rem; color:#64748b;">Minimal 8 karakter jika diisi</span>
+            <button type="button" class="btn-text" onclick="generateRandomPass('wifiPasswordInput')">🎲 Buat Password Acak</button>
+          </div>
+        </div>
+
+        <!-- Section: Akun Member Free Hotspot (Bonus Internet) -->
+        <div class="form-group" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:0; color:#10b981; font-weight:600; user-select:none;">
+            <input type="checkbox" id="chkFreeHotspot" onchange="toggleHotspotFields()" style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
+            <span>🎁 Sertakan Akun Member Free Hotspot (Bonus Internet)</span>
+          </label>
+          
+          <div id="hotspotFieldsWrap" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed rgba(16, 185, 129, 0.25);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:block;">Username Hotspot</label>
+                <input type="text" id="wifiHotspotUser" placeholder="Contoh: km_iqbal" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
+              </div>
+              <div>
+                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                  <span>Password Hotspot</span>
+                  <a href="javascript:void(0)" onclick="generateHotspotPass()" style="font-size:0.72rem; color:#34d399; text-decoration:none; font-weight:600;">🎲 Acak</a>
+                </label>
+                <input type="text" id="wifiHotspotPass" placeholder="Contoh: 1234" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:10px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                  <span>🏷️ Profile MikroTik Hotspot</span>
+                  <a href="javascript:void(0)" onclick="refreshMikrotikProfiles(true)" style="font-size:0.7rem; color:#38bdf8; text-decoration:none;">🔄 Refresh</a>
+                </label>
+                <select id="wifiHotspotProfile" style="padding:8px 10px; font-size:0.88rem; background:rgba(15, 23, 42, 0.85); color:#f8fafc; border:1px solid rgba(255,255,255,0.15); border-radius:6px; width:100%;">
+                  <option value="FREE Member" selected>FREE Member (1 Mbps - 1 HP)</option>
+                  <option value="FREE 2 HP">FREE 2 HP (5 Mbps - 2 HP)</option>
+                  <option value="FREE 4 HP">FREE 4 HP (5 Mbps - 4 HP)</option>
+                  <option value="default">default</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:block;">Catatan Hotspot</label>
+                <input type="text" id="wifiHotspotNote" placeholder="Keterangan voucher/titik" value="Bisa digunakan di seluruh titik Hotspot WiFi kami" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
+              </div>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:6px; font-size:0.74rem; color:#34d399; background:rgba(16, 185, 129, 0.12); padding:8px 10px; border-radius:6px; border:1px solid rgba(16, 185, 129, 0.2);">
+              <span style="font-size:0.9rem; line-height:1;">⚡</span>
+              <div>
+                <strong>Auto-Sync MikroTik:</strong> User & password ini akan <strong>otomatis langsung terdaftar di Winbox MikroTik</strong> (<code>/ip hotspot user</code>) saat Anda klik Simpan atau Kirim via Bot WA!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Nomor WhatsApp Pelanggan</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="wifiCustomerPhoneInput" placeholder="Contoh: 081234567890">
+            <button type="button" class="btn btn-sm btn-whatsapp" id="btnSendBotWa" onclick="sendWifiViaBotWa()" title="Kirim data Wi-Fi & Hotspot langsung dari Bot WhatsApp ke HP pelanggan">
+              <span>🤖</span> <span>Kirim via Bot WA</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="shareWifiToWhatsApp()" title="Buka WhatsApp Web / Chat">
+              <span>📲</span> <span>Chat WA</span>
+            </button>
+          </div>
+          <span class="form-tip">Nomor disimpan otomatis. Kirim data Wi-Fi & Akun Hotspot langsung via Bot atau manual Chat WA.</span>
+        </div>
+
+        <div class="alert-info" style="margin-bottom:18px;">
+          💡 <strong>Info:</strong> Jika sandi baru diisi, modem akan update otomatis. Jika sandi dikosongkan, modem tetap menggunakan sandi lama lokal. Di pesan WhatsApp akan tertulis info yang sesuai.
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('wifiModal')">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveWifi">
+            <span class="btn-text-content">Simpan & Kirim ke Modem</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Ganti Akun PPPoE -->
+  <div class="modal-backdrop" id="pppoeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-cyan">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          </div>
+          <div>
+            <h3>Ubah Akun PPPoE</h3>
+            <p id="pppoeModalTarget">Target: Pelanggan</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('pppoeModal')">&times;</button>
+      </div>
+
+      <form id="pppoeForm" onsubmit="submitPppoeChange(event)">
+        <input type="hidden" id="pppoeDeviceId">
+        
+        <div class="form-group">
+          <label>Username PPPoE</label>
+          <input type="text" id="pppoeUserInput" required placeholder="Contoh: km_aulia">
+        </div>
+
+        <div class="form-group">
+          <label>Password PPPoE</label>
+          <div class="password-input-wrap">
+            <input type="password" id="pppoePassInput" required placeholder="Password PPPoE">
+            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('pppoePassInput', this)">👁️</button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('pppoeModal')">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSavePppoe">Simpan ke Modem</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Reboot -->
+  <div class="modal-backdrop" id="rebootModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-red">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+          </div>
+          <div>
+            <h3>Restart Modem ONT</h3>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('rebootModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin me-restart modem milik <strong id="rebootTargetName">Pelanggan</strong>?</p>
+        <p class="text-muted" style="margin-top: 8px;">Koneksi internet pelanggan akan terputus sementara selama 1-2 menit hingga modem menyala kembali.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('rebootModal')">Batal</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmReboot" onclick="confirmRebootAction()">
+          <span>Ya, Restart Modem</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MikroTik Hotspot -->
+  <div class="modal-backdrop" id="hotspotModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-cyan">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 11c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 2c0-3.31-2.69-6-6-6s-6 2.69-6 6c0 2.22 1.21 4.15 3 5.19l1-1.74c-1.19-.7-2-1.97-2-3.45 0-2.21 1.79-4 4-4s4 1.79 4 4c0 1.48-.81 2.75-2 3.45l1 1.74c1.79-1.04 3-2.97 3-5.19zM12 3C6.48 3 2 7.48 2 13c0 3.7 2.01 6.92 4.99 8.65l1-1.73C5.61 18.33 4 15.86 4 13c0-4.41 3.59-8 8-8s8 3.59 8 8c0 2.86-1.61 5.33-3.99 6.92l1 1.73C19.99 19.92 22 16.7 22 13c0-5.52-4.48-10-10-10z"/></svg>
+          </div>
+          <div>
+            <h3>MikroTik Hotspot Aktif</h3>
+            <p id="hotspotModalSub">Router: 192.168.88.1 (Port 8728)</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('hotspotModal')">&times;</button>
+      </div>
+
+      <!-- Modal Tabs -->
+      <div class="modal-nav-tabs">
+        <button type="button" class="tab-btn" id="tabBtnBrand" onclick="switchHotspotTab('brand')">
+          🎨 Ganti Brand & Logo
+        </button>
+        <button type="button" class="tab-btn" id="tabBtnAdmin" onclick="switchHotspotTab('admin')">
+          🔒 Akun Admin
+        </button>
+        <button type="button" class="tab-btn" id="tabBtnTelegram" onclick="switchHotspotTab('telegram')">
+          🤖 Bot & Notifikasi (WA / Telegram)
+        </button>
+        <button type="button" class="tab-btn" id="tabBtnSettings" onclick="switchHotspotTab('settings')">
+          📡 Koneksi MikroTik
+        </button>
+        <button type="button" class="tab-btn active" id="tabBtnUsers" onclick="switchHotspotTab('users')">
+          👥 Hotspot Aktif (<span id="modalHotspotCount">0</span>)
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab 0: Brand & Logo Identity -->
+        <div id="tabContentBrand" class="tab-pane">
+          <form id="brandConfigForm" onsubmit="saveBrandSettings(event)">
+            <div class="brand-preview-wrap" style="display:flex; align-items:center; gap:20px; margin-bottom:20px; padding:16px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:var(--radius-sm);">
+              <div style="width:75px; height:75px; border-radius:12px; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; border:1px dashed var(--primary-cyan); overflow:hidden;">
+                <img id="brandLogoPreview" src="logo.png" alt="Preview Logo" style="max-width:100%; max-height:100%; object-fit:contain;">
+              </div>
+              <div style="flex:1;">
+                <h4 id="previewBrandTitle" style="color:var(--text-main); margin-bottom:4px; font-size:1.15rem; font-weight:700;">NOC PANEL</h4>
+                <p id="previewBrandBadge" style="color:var(--primary-cyan); font-size:0.8rem; font-weight:600;">TR-069 & Hotspot • by Kurtech</p>
+                <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+                  <label class="btn btn-secondary btn-sm" style="cursor:pointer; margin:0;">
+                    📁 Pilih File Logo Baru
+                    <input type="file" id="logoFileInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
+                  </label>
+                  <button type="button" class="btn btn-sm" style="background:rgba(255,255,255,0.05); color:var(--text-muted);" onclick="resetLogoDefault()">Reset Default</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nama Server / Brand</label>
+                <input type="text" id="brandNameInput" required placeholder="Contoh: KURTECH, WIFI NET, atau Nama ISP Anda" oninput="updateBrandPreview()">
+              </div>
+              <div class="form-group">
+                <label>Badge / Slogan</label>
+                <input type="text" id="brandBadgeInput" required placeholder="Contoh: TR-069 & Hotspot • by Kurtech" oninput="updateBrandPreview()">
+              </div>
+            </div>
+
+            <div class="alert-info" style="margin-top: 12px;">
+              💡 <strong>Info:</strong> Nama brand dan logo akan langsung berganti di navbar atas dan judul tab browser tanpa perlu restart server.
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; margin-top: 16px;">
+              <button type="submit" class="btn btn-primary" id="btnSaveBrand">
+                <span>Simpan Brand & Logo</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab: Admin Account Settings -->
+        <div id="tabContentAdmin" class="tab-pane">
+          <form id="adminAccountForm" onsubmit="saveAdminCredentials(event)">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label>Username Administrator</label>
+              <input type="text" id="adminUsernameInput" required placeholder="Contoh: admin">
+              <span class="form-tip">Username untuk masuk ke web panel ini.</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label>Password Lama</label>
+              <input type="password" id="adminOldPasswordInput" required placeholder="Masukkan password saat ini">
+            </div>
+
+            <div class="form-row" style="margin-bottom: 16px;">
+              <div class="form-group">
+                <label>Password Baru</label>
+                <input type="password" id="adminNewPasswordInput" required minlength="4" placeholder="Minimal 4 karakter">
+              </div>
+              <div class="form-group">
+                <label>Ulangi Password Baru</label>
+                <input type="password" id="adminConfirmPasswordInput" required minlength="4" placeholder="Ketik ulang password baru">
+              </div>
+            </div>
+
+            <div class="alert-info" style="margin-top: 12px;">
+              💡 <strong>Tips:</strong> Setelah password diperbarui, Anda dapat login menggunakan kredensial baru pada sesi berikutnya.
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; margin-top: 16px;">
+              <button type="submit" class="btn btn-primary" id="btnSaveAdminCreds">
+                <span>Simpan Password Baru</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab 1: List Users -->
+        <div id="tabContentUsers" class="tab-pane active">
+          <div class="table-tools">
+            <input type="text" id="hotspotSearchInput" placeholder="Cari voucher, IP, MAC..." oninput="filterHotspotUsers()" class="input-search-modal">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fetchHotspotData(true)">
+              🔄 Segarkan Data
+            </button>
+          </div>
+
+          <div class="modal-table-wrap">
+            <table class="modal-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Voucher / User</th>
+                  <th>IP Address</th>
+                  <th>MAC Address</th>
+                  <th>Uptime</th>
+                  <th>Download / Upload</th>
+                </tr>
+              </thead>
+              <tbody id="hotspotUsersTableBody">
+                <tr>
+                  <td colspan="6" class="loading-state">Memuat data user aktif...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Settings -->
+        <div id="tabContentSettings" class="tab-pane">
+          <form id="mikrotikConfigForm" onsubmit="saveMikrotikSettings(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>IP Router MikroTik</label>
+                <input type="text" id="mtHostInput" required placeholder="192.168.88.1">
+              </div>
+              <div class="form-group">
+                <label>Port API MikroTik</label>
+                <input type="number" id="mtPortInput" required placeholder="8728">
+                <small class="form-tip">Port API default: 8728 (atau 9926)</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Username API</label>
+                <input type="text" id="mtUserInput" required placeholder="panelacs">
+              </div>
+              <div class="form-group">
+                <label>Password API</label>
+                <div class="password-input-wrap">
+                  <input type="password" id="mtPassInput" placeholder="Password API">
+                  <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('mtPassInput', this)">👁️</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert-info" style="margin-top: 12px;">
+              💡 <strong>Tips Buat User MikroTik:</strong> Buka <em>Terminal Winbox</em> lalu jalankan perintah ini:
+              <div class="code-copy-box">
+                <code>/user add name=panelacs group=read password=admin comment="API Panel ACS"</code>
+                <button type="button" class="btn-copy" onclick="copyWinboxCommand()">Salin</button>
+              </div>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; margin-top: 16px;">
+              <button type="submit" class="btn btn-primary" id="btnSaveMtConfig">
+                <span>Simpan & Tes Koneksi</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab: Bot & Notifikasi (WhatsApp Barcode & Telegram) -->
+        <div id="tabContentTelegram" class="tab-pane">
+          <form id="notificationConfigForm" onsubmit="saveNotificationSettings(event)">
+            
+            <!-- Gateway Channel Choice -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+              <label style="display:block; margin-bottom:10px; font-weight:700; color:var(--text-main); font-size:0.95rem;">
+                🎯 Pilih Saluran Bot Notifikasi:
+              </label>
+              <div class="gateway-channel-pills" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(37,211,102,0.1); border:1px solid rgba(37,211,102,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+                  <input type="radio" name="notifChannel" value="whatsapp" id="channelWa" onchange="updateChannelPanelsUI()">
+                  <span style="color:#25D366; font-weight:600; font-size:0.88rem;">📱 WhatsApp Bot Saja (Scan Barcode)</span>
+                </label>
+                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(0,112,243,0.1); border:1px solid rgba(0,112,243,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+                  <input type="radio" name="notifChannel" value="telegram" id="channelTg" onchange="updateChannelPanelsUI()">
+                  <span style="color:#93c5fd; font-weight:600; font-size:0.88rem;">✈️ Telegram Bot Saja</span>
+                </label>
+                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(0,242,254,0.1); border:1px solid rgba(0,242,254,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+                  <input type="radio" name="notifChannel" value="both" id="channelBoth" checked onchange="updateChannelPanelsUI()">
+                  <span style="color:var(--primary-cyan); font-weight:600; font-size:0.88rem;">⚡ Keduanya Aktif (WA & Telegram)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- WhatsApp Bot Subpanel -->
+            <div id="waSubpanel" style="background:rgba(37,211,102,0.04); border:1px solid rgba(37,211,102,0.22); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:1.3rem;">📱</span>
+                  <div>
+                    <strong style="color:#25D366; font-size:0.95rem;">Bot WhatsApp NOC (Scan Barcode)</strong>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Tautkan WhatsApp Anda seperti WhatsApp Web agar bot bisa mengirim pesan otomatis</div>
+                  </div>
+                </div>
+                <div id="waStatusBadge">
+                  <span class="status-badge offline">🔴 Belum Terhubung</span>
+                </div>
+              </div>
+
+              <!-- Dual Mode Linking Buttons -->
+              <div style="display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-sm btn-whatsapp" id="btnTriggerWaConnect" onclick="connectWhatsApp('qr')">
+                  <span>📸 Tampilkan Barcode Baru</span>
+                </button>
+                <button type="button" class="btn btn-sm" id="btnTriggerWaCode" style="background:rgba(0,242,254,0.12); color:var(--primary-cyan); border:1px solid rgba(0,242,254,0.35);" onclick="requestWaPairingCode()">
+                  <span>🔢 Tautkan Pakai Kode 8-Digit</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="checkWhatsAppStatus(true)">
+                  🔄 Cek Status
+                </button>
+              </div>
+
+              <!-- Barcode QR View Box -->
+              <div id="waQrBox" style="display:none; text-align:center; padding:18px; background:rgba(0,0,0,0.5); border:1px dashed #25D366; border-radius:var(--radius-sm); margin-bottom:14px;">
+                <div style="font-size:0.88rem; color:var(--text-main); margin-bottom:10px; font-weight:600;">
+                  📸 Arahkan Kamera WhatsApp HP Anda ke Barcode Ini:
+                </div>
+                <div style="background:#ffffff; display:inline-block; padding:12px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                  <img id="waQrImage" src="" alt="Barcode WhatsApp" style="width:200px; height:200px; display:block;">
+                </div>
+                <div style="margin-top:10px; font-size:0.8rem; color:#93c5fd;">
+                  Buka WhatsApp di HP &gt; Titik Tiga (atau Pengaturan) &gt; <strong>Perangkat Tertaut</strong> &gt; <strong>Tautkan Perangkat</strong>.
+                </div>
+                <div style="margin-top:4px; font-size:0.75rem; color:var(--text-muted);">
+                  💡 <em>Jika kamera sulit scan, gunakan tombol <strong>"🔢 Tautkan Pakai Kode 8-Digit"</strong> di atas.</em>
+                </div>
+              </div>
+
+              <!-- Pairing Code View Box -->
+              <div id="waPairingBox" style="display:none; text-align:center; padding:18px; background:rgba(0,242,254,0.05); border:1px dashed var(--primary-cyan); border-radius:var(--radius-sm); margin-bottom:14px;">
+                <div style="font-size:0.88rem; color:var(--text-main); margin-bottom:8px; font-weight:600;">
+                  🔢 Masukkan Kode Ini di WhatsApp HP Anda:
+                </div>
+                <div style="display:inline-flex; align-items:center; gap:10px; background:#070d18; border:1px solid var(--primary-cyan); padding:10px 18px; border-radius:8px; box-shadow:0 4px 16px rgba(0,242,254,0.15);">
+                  <span id="waPairingCodeDisplay" style="font-family:var(--font-mono); font-size:1.8rem; font-weight:800; letter-spacing:5px; color:#00f2fe;">---- - ----</span>
+                  <button type="button" class="btn btn-sm btn-secondary" onclick="copyPairingCode()" title="Salin Kode">📋 Salin</button>
+                </div>
+                <div style="margin-top:12px; font-size:0.82rem; color:var(--text-main); line-height:1.5; text-align:left; max-width:440px; margin-left:auto; margin-right:auto;">
+                  <strong>Langkah di WhatsApp HP:</strong><br>
+                  1. Buka WhatsApp di HP &gt; Titik Tiga / Pengaturan &gt; <strong>Perangkat Tertaut</strong><br>
+                  2. Ketuk <strong>Tautkan Perangkat</strong><br>
+                  3. Pada bagian bawah layar HP, ketuk: <strong style="color:var(--primary-cyan);">"Tautkan dengan nomor telepon saja"</strong><br>
+                  4. Masukkan kode 8-digit di atas. Selesai!
+                </div>
+              </div>
+
+              <!-- Connected Account Info Box -->
+              <div id="waConnectedBox" style="display:none; padding:12px 14px; background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.25); border-radius:var(--radius-sm); margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                  <div>
+                    <span style="color:#00e676; font-weight:700;">🟢 Terhubung sebagai:</span>
+                    <strong id="waConnectedPhone" style="color:var(--text-main); font-family:var(--font-mono); margin-left:6px;">+62 ...</strong>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-danger-soft" onclick="disconnectWhatsApp()">Putuskan Sesi WA</button>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Nomor WhatsApp Admin NOC (Penerima Laporan &amp; Tautan Bot)</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="waAdminPhoneInput" placeholder="Contoh: 081234567890">
+                  <button type="button" class="btn btn-secondary btn-sm" style="white-space:nowrap;" onclick="testWhatsAppAlert()">🧪 Tes Kirim WA</button>
+                </div>
+                <span class="form-tip">Nomor ini digunakan untuk menerima alert otomatis (LOS &amp; redaman) dan untuk request Kode Tautan 8-Digit.</span>
+              </div>
+            </div>
+
+            <!-- Telegram Bot Subpanel -->
+            <div id="tgSubpanel" style="background:rgba(0,112,243,0.04); border:1px solid rgba(0,112,243,0.22); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span style="font-size:1.3rem;">✈️</span>
+                <div>
+                  <strong style="color:#93c5fd; font-size:0.95rem;">Bot Telegram (Opsional)</strong>
+                  <div style="font-size:0.78rem; color:var(--text-muted);">Gunakan Bot Telegram jika Anda ingin alert terkirim ke Grup Telegram NOC</div>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Bot Token Telegram</label>
+                <div class="password-input-wrap">
+                  <input type="password" id="tgTokenInput" placeholder="Contoh: 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
+                  <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('tgTokenInput', this)">👁️</button>
+                </div>
+                <span class="form-tip">Dapatkan Bot Token gratis dengan membuat bot di <strong>@BotFather</strong> di Telegram.</span>
+              </div>
+
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Chat ID Telegram (ID Pribadi / Grup NOC)</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="tgChatIdInput" placeholder="Contoh: 123456789 atau -100xxxxxxxx (Grup NOC)">
+                  <button type="button" class="btn btn-secondary btn-sm" style="white-space:nowrap;" onclick="testTelegramAlert()" id="btnTestTg">🧪 Tes Telegram</button>
+                </div>
+                <span class="form-tip">Kirim pesan ke <strong>@userinfobot</strong> di Telegram untuk cek ID Anda, atau gunakan ID Grup NOC.</span>
+              </div>
+            </div>
+
+            <!-- Event Trigger Checkboxes -->
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px; background:rgba(0,0,0,0.25); padding:14px; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.05);">
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:var(--text-main);">
+                <input type="checkbox" id="alertLosInput" checked style="accent-color:var(--accent-red); width:18px; height:18px;">
+                <span>🚨 Kirim notifikasi NOC (Admin) jika Modem Mati / Kabel Putus (LOS) &gt; 10 menit</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:#25D366;">
+                <input type="checkbox" id="alertCustomerLosInput" checked style="accent-color:#25D366; width:18px; height:18px;">
+                <span>📲 <strong>Kirim pesan otomatis ke WhatsApp Pelanggan</strong> saat modem mereka mati/LOS &gt; 10 menit (dan pesan saat online kembali)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:var(--text-main);">
+                <input type="checkbox" id="alertRxInput" checked style="accent-color:var(--accent-yellow); width:18px; height:18px;">
+                <span>⚠️ Kirim notifikasi NOC (Admin) jika Redaman Optik Kritis (&le; -27 dBm)</span>
+              </label>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; margin-top: 16px; display:flex; justify-content:flex-end;">
+              <button type="submit" class="btn btn-primary" id="btnSaveNotifications">
+                <span>Simpan Pengaturan Notifikasi</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Daftar HP / Klien Terhubung -->
+  <div class="modal-backdrop" id="connectedClientsModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-blue">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+          </div>
+          <div>
+            <h3>Daftar HP / Perangkat Terhubung</h3>
+            <p id="clientsModalTarget">Target: Pelanggan</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('connectedClientsModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="table-tools" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="font-size:0.9rem; color:var(--text-main);">
+            Total Terhubung: <strong id="clientsTotalCount" style="color:var(--primary-cyan); font-size:1.1rem; font-family:var(--font-mono);">0</strong> Perangkat
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshClients" onclick="refreshConnectedClients()">
+            🔄 Segarkan List HP
+          </button>
+        </div>
+
+        <div class="modal-table-wrap">
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Perangkat / Host</th>
+                <th>Tipe</th>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>Kuat Sinyal (RSSI)</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTableBody">
+              <tr>
+                <td colspan="6" class="loading-state">
+                  <div class="spinner"></div>
+                  <p>Memuat daftar perangkat...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Diagnostik Ping & Latensi -->
+  <div class="modal-backdrop" id="pingModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-yellow">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+          </div>
+          <div>
+            <h3>Uji Ping & Latensi Modem</h3>
+            <p id="pingModalTarget">Target: IP</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('pingModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="pingLoadingBox" style="text-align:center; padding:30px 10px;">
+          <div class="spinner" style="margin:0 auto 12px;"></div>
+          <p style="color:var(--text-muted); font-size:0.9rem;">Mengirim 3 paket ICMP Ping ke modem...</p>
+        </div>
+
+        <div id="pingResultBox" style="display:none;">
+          <div class="ping-status-banner" id="pingStatusBanner" style="display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:14px; background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.25);">
+            <div id="pingStatusIcon" style="font-size:1.4rem;">🟢</div>
+            <div>
+              <div id="pingStatusTitle" style="font-weight:700; font-size:1.05rem; color:#00e676;">Sangat Bagus</div>
+              <div id="pingStatusDesc" style="font-size:0.8rem; color:var(--text-muted);">IP merespons stabil tanpa kendala</div>
+            </div>
+          </div>
+
+          <div class="ping-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:14px;">
+            <div class="ping-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px; border-radius:var(--radius-sm); text-align:center;">
+              <span class="ping-lbl" style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:2px;">Rata-rata (Avg)</span>
+              <span class="ping-val" id="pingAvgVal" style="font-size:1.15rem; font-weight:700; color:var(--primary-cyan); font-family:var(--font-mono);">0 ms</span>
+            </div>
+            <div class="ping-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px; border-radius:var(--radius-sm); text-align:center;">
+              <span class="ping-lbl" style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:2px;">Tercepat (Min)</span>
+              <span class="ping-val" id="pingMinVal" style="font-size:1.15rem; font-weight:700; color:#93c5fd; font-family:var(--font-mono);">0 ms</span>
+            </div>
+            <div class="ping-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px; border-radius:var(--radius-sm); text-align:center;">
+              <span class="ping-lbl" style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:2px;">Terlambat (Max)</span>
+              <span class="ping-val" id="pingMaxVal" style="font-size:1.15rem; font-weight:700; color:#fbbf24; font-family:var(--font-mono);">0 ms</span>
+            </div>
+            <div class="ping-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px; border-radius:var(--radius-sm); text-align:center;">
+              <span class="ping-lbl" style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:2px;">Packet Loss</span>
+              <span class="ping-val" id="pingLossVal" style="font-size:1.15rem; font-weight:700; color:var(--accent-green); font-family:var(--font-mono);">0%</span>
+            </div>
+          </div>
+
+          <details style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:var(--radius-sm); padding:10px;">
+            <summary style="cursor:pointer; font-size:0.8rem; color:var(--text-muted); outline:none;">Lihat Output Raw Ping Windows</summary>
+            <pre id="pingRawOutput" style="font-family:var(--font-mono); font-size:0.75rem; color:#93c5fd; margin-top:8px; white-space:pre-wrap; overflow-x:auto;"></pre>
+          </details>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('pingModal')">Tutup</button>
+        <button type="button" class="btn btn-primary" id="btnRepeatPing" onclick="repeatCurrentPing()">
+          ⚡ Ping Ulang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah / Edit Nomor WhatsApp Pelanggan -->
+  <div class="modal-backdrop" id="phoneModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon icon-green">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </div>
+          <div>
+            <h3>Nomor WhatsApp Pelanggan</h3>
+            <p id="phoneModalTarget">Target: Pelanggan</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeModal('phoneModal')">&times;</button>
+      </div>
+
+      <form id="phoneForm" onsubmit="submitPhoneChange(event)">
+        <input type="hidden" id="phoneDeviceId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nomor WhatsApp Pelanggan</label>
+            <input type="text" id="phoneInput" required placeholder="Contoh: 081234567890">
+            <span class="form-tip">Masukkan nomor HP aktif untuk kirim info Wi-Fi otomatis via Bot WA.</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('phoneModal')">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSavePhone">Simpan Nomor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer Attribution -->
+  <footer style="text-align: center; padding: 24px 16px 40px; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.3px;">
+    <span>GenieACS TR-069 & Hotspot Management Panel</span> • 
+    <span style="color: #60a5fa; font-weight: 600;">by Kurtech</span> • 
+    <a href="https://kurtech.my.id" target="_blank" style="color: var(--primary-cyan); text-decoration: none; font-weight: 500;">kurtech.my.id</a>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js?v=2.9"></script>
+</body>
+</html>

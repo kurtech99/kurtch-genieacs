@@ -1,0 +1,118 @@
+==================================================================================
+   🚀 PAKET GENIEACS TR-069 + NOC WEB PANEL & BOT WHATSAPP (BY KURTECH)
+   🌐 Official Website : https://kurtech.my.id
+   💬 WhatsApp Support  : https://wa.me/628985560932
+==================================================================================
+
+Halo! Terima kasih telah menggunakan Paket GenieACS TR-069 + NOC Web Panel Kurtech.
+Paket ini sudah dipisahkan menjadi 2 folder khusus agar mudah digunakan:
+
+📁 STRUKTUR FOLDER:
+├── 📁 windows                  -> Khusus Komputer / Server Windows 10/11 / Server
+├── 📁 LINUX-STB-PROXMOX-VPS    -> Khusus Ubuntu, Debian, STB Armbian, Proxmox, & VPS
+└── 📄 CATATAN-PANDUAN-CEPAT.txt -> Panduan Ringkas Siap Share ke Pembeli / Tim
+
+==================================================================================
+📌 PILIHAN 1: VERSI WINDOWS (FOLDER: windows)
+==================================================================================
+Cocok untuk: Laptop / PC Server Windows 10/11 atau Windows Server.
+
+Langkah Pasang:
+1. Buka folder "windows".
+2. Download & instal MongoDB Windows (Gunakan link: "1.Mongodb-Download.url").
+3. Download & instal NodeJS LTS (Gunakan link: "2.NodeJS-Download.url").
+4. Klik kanan pada file "3.Install-ACS.bat" -> Pilih "Run as administrator".
+5. Tekan ENTER untuk lokasi default (C:\genieacs-app).
+6. Selesai! GenieACS dan Panel NOC otomatis langsung aktif dan berjalan di background.
+
+Akses:
+- NOC Web Panel : http://localhost:3300  (atau http://IP_KOMPUTER:3300)
+- GenieACS UI   : http://localhost:3000
+
+==================================================================================
+📌 PILIHAN 2: VERSI UBUNTU / LINUX / STB / PROXMOX / VPS (FOLDER: LINUX-STB-PROXMOX-VPS)
+==================================================================================
+Cocok untuk: 
+- Server Ubuntu 20.04 / 22.04 / 24.04 LTS & Debian 11/12
+- STB Bekas B860H / HG680P (Hemat listrik ~5 Watt, colok LAN dapat IP DHCP MikroTik)
+- Proxmox VE (LXC Container Debian 12 / Ubuntu 22.04 baru)
+- Cloud VPS (Ubuntu / Debian dengan IP Publik)
+
+Langkah Pasang (Server Baru):
+1. Buka folder "LINUX-STB-PROXMOX-VPS".
+2. Salin seluruh isi folder tersebut ke server Ubuntu/Linux Anda via WinSCP ke folder "/root/".
+3. Buka terminal PuTTY / SSH, ketik:
+   cd /root/LINUX-STB-PROXMOX-VPS
+   chmod +x install.sh
+   bash install.sh
+4. Tunggu 3-5 menit. Script otomatis memasang Node.js, MongoDB, GenieACS, 
+   Virtual Parameters, Panel Web, dan mendaftarkan auto-start on boot (systemd).
+
+Akses:
+- NOC Web Panel : http://IP_SERVER:3300
+- GenieACS UI   : http://IP_SERVER:3000
+
+==================================================================================
+📌 PILIHAN 3: KHUSUS PROXMOX / UBUNTU YANG SUDAH ADA GENIEACS (PASANG PANEL SAJA)
+==================================================================================
+Cocok untuk: Anda yang di server Ubuntu / Proxmox-nya SUDAH BERJALAN GenieACS dan 
+HANYA ingin menambahkan Web Panel & Bot WhatsApp TANPA MENGHAPUS modem pelanggan lama.
+
+Langkah Pasang:
+1. Salin folder "LINUX-STB-PROXMOX-VPS" ke server Anda via WinSCP ke "/root/".
+2. Buka terminal SSH / Console Proxmox, ketik:
+   cd /root/LINUX-STB-PROXMOX-VPS
+   chmod +x install-panel-only.sh
+   bash install-panel-only.sh
+3. Selesai! Data modem lama 100% AMAN. Panel langsung aktif di port 3300.
+
+Akses:
+- NOC Web Panel : http://IP_SERVER:3300
+
+==================================================================================
+🔑 KREDENSIAL LOGIN DEFAULT RESMI:
+==================================================================================
+* NOC Web Panel (Port 3300):
+  - Username : admin
+  - Password : admin
+  *(Nama Brand ISP dan Password bisa diganti bebas di menu Pengaturan / Ikon Gerigi)*
+
+* GenieACS UI Resmi (Port 3000):
+  - Username : admin
+  - Password : admin
+
+* TR-069 Inform URL (Diisi pada menu CWMP Modem ONT Pelanggan):
+  - URL      : http://IP_SERVER:7547/
+  - Username : admin
+  - Password : admin
+
+==================================================================================
+✨ FITUR-FITUR UNGGULAN PANEL NOC KURTECH:
+==================================================================================
+1. 📊 Monitoring Real-Time: Redaman RX (dBm), PON Mode (GPON/EPON), Suhu, Uptime.
+2. 🤖 Bot WhatsApp Otomatis:
+   - Kirim rincian SSID & Password WiFi ke nomor WhatsApp pelanggan (1-Klik).
+   - Notifikasi otomatis kabel putus / LOS (>10 menit) ke WA Admin & Pelanggan.
+   - Notifikasi otomatis saat koneksi internet kembali online normal.
+   - Antrian Pesan Otomatis (Throttling) agar nomor WA Admin anti-banned.
+   - Proteksi Gangguan Massal (jika PLN padam >40% modem, bot menahan spam).
+3. 📥 Corporate Excel Export (.xlsx):
+   - Unduh 100 - 1.000 data modem pelanggan dalam 1 detik.
+   - Dilengkapi 5 KPI Card, status warna, dan format nomor WA teks (08...).
+4. ⚡ Diagnostic Latensi: Uji ping & packet loss langsung dari server ke modem.
+5. 📱 Live Clients: Melihat daftar nama HP / laptop yang sedang terhubung ke WiFi.
+6. 🌐 Live Search Cepat: Cari nama pelanggan, no WA, PPPoE, SSID, SN, dan IP.
+7. 🎁 Free Hotspot Member Bonus & Auto MikroTik: Sekali klik simpan di panel, akun otomatis langsung dibuatkan ke MikroTik Winbox (/ip hotspot user) dengan profile khusus (FREE Member / 1 Mbps) serta terkirim ke WhatsApp pelanggan.
+
+==================================================================================
+🛠️ PERINTAH PRAKTIS DI TERMINAL LINUX / UBUNTU:
+==================================================================================
+- Cek semua service aktif : acs-status
+- Restart semua service   : acs-restart
+- Pantau log real-time WA : journalctl -u panel-acs -f
+
+Panduan lengkap, setting MikroTik DHCP static, & NAT silakan baca:
+📄 LINUX-STB-PROXMOX-VPS/PANDUAN-INSTALL-STB-PROXMOX-VPS.md
+==================================================================================
+   © 2026 KURTECH (https://kurtech.my.id) — All Rights Reserved
+==================================================================================
