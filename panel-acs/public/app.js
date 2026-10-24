@@ -1071,8 +1071,8 @@ function switchHotspotTab(tab) {
 }
 
 // ---------------------------------------------
-// Authentication & Admin Management
-// ---------------------------------------------
+let sessionExpireTimer = null;
+
 async function checkAuth() {
   try {
     const res = await fetch('/api/auth/me');
@@ -1089,6 +1089,18 @@ async function checkAuth() {
       const adminNameEl = document.getElementById('currentAdminName');
       if (adminNameEl && data.user && data.user.username) {
         adminNameEl.textContent = data.user.username;
+      }
+
+      // Logout otomatis jika sudah 1 jam terbuka
+      if (typeof data.remainingSeconds === 'number') {
+        if (sessionExpireTimer) clearTimeout(sessionExpireTimer);
+        const msRemaining = Math.max(1000, data.remainingSeconds * 1000);
+        sessionExpireTimer = setTimeout(() => {
+          showToast('Sesi telah mencapai 1 jam. Mengalihkan ke halaman login...', 'warning');
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 1500);
+        }, msRemaining);
       }
     }
   } catch (e) {

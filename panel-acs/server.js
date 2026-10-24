@@ -91,7 +91,7 @@ function sendTelegramMessage(botToken, chatId, text) {
 
 
 const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari
+const SESSION_TTL_MS = 60 * 60 * 1000; // Tepat 1 Jam (3600 detik)
 
 function loadSessionsFromDisk() {
   const map = new Map();
@@ -152,12 +152,6 @@ function isValidSession(req) {
     saveSessionsToDisk();
     return false;
   }
-  // Rolling session: perpanjang sesi 30 hari setiap ada interaksi aktif
-  const remaining = sess.expiresAt - Date.now();
-  if (remaining < SESSION_TTL_MS / 2) {
-    sess.expiresAt = Date.now() + SESSION_TTL_MS;
-    saveSessionsToDisk();
-  }
   return true;
 }
 
@@ -173,7 +167,7 @@ function createSession(username) {
   sessions.set(token, {
     username,
     createdAt: now,
-    expiresAt: now + SESSION_TTL_MS
+    expiresAt: now + SESSION_TTL_MS // Tepat 1 jam aktif sejak login
   });
   saveSessionsToDisk();
   return token;
@@ -402,7 +396,7 @@ const server = http.createServer(async (req, res) => {
 
     if (username === validUser && password === validPass) {
       const token = createSession(username);
-      const cookieVal = `acs_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 86400}`;
+      const cookieVal = `acs_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`;
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Set-Cookie': cookieVal
@@ -436,10 +430,12 @@ const server = http.createServer(async (req, res) => {
     if (isValidSession(req)) {
       const sess = getSessionUser(req);
       const cfg = loadConfig();
+      const remainingSeconds = sess ? Math.max(0, Math.floor((sess.expiresAt - Date.now()) / 1000)) : 3600;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({
         authenticated: true,
-        user: { username: sess?.username || cfg.auth?.username || 'admin' }
+        user: { username: sess?.username || cfg.auth?.username || 'admin' },
+        remainingSeconds
       }));
     } else {
       res.writeHead(200, { 'Content-Type': 'application/json' });
