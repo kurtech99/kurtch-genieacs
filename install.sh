@@ -86,18 +86,21 @@ echo -e "${BLUE}[3/8] Memeriksa & Menginstall MongoDB Database Server...${NC}"
 if systemctl is-active --quiet mongod || systemctl is-active --quiet mongodb; then
   echo -e "${GREEN}[OK] Layanan MongoDB sudah berjalan aktif.${NC}"
 else
-  echo -e "${YELLOW}[INFO] Menambahkan repository resmi MongoDB untuk $ARCH...${NC}"
-  # MongoDB 6.0/7.0 Key
-  curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg --yes || true
+  # Deteksi Versi MongoDB yang Didukung (Bookworm wajib MongoDB 7.0)
+  MONGO_VER="6.0"
+  if [ "$CODENAME" = "bookworm" ]; then
+    MONGO_VER="7.0"
+  fi
+  curl -fsSL https://www.mongodb.org/static/pgp/server-$MONGO_VER.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-$MONGO_VER.gpg --yes || true
   
   if [ "$DISTRO" = "ubuntu" ]; then
     UBUNTU_CODENAME="jammy"
     if [ "$VERSION_ID" = "20.04" ]; then UBUNTU_CODENAME="focal"; fi
-    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu $UBUNTU_CODENAME/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$MONGO_VER.gpg ] https://repo.mongodb.org/apt/ubuntu $UBUNTU_CODENAME/mongodb-org/$MONGO_VER multiverse" | tee /etc/apt/sources.list.d/mongodb-org-$MONGO_VER.list
   elif [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "armbian" ]; then
     DEB_CODENAME="bullseye"
     if [ "$CODENAME" = "bookworm" ]; then DEB_CODENAME="bookworm"; fi
-    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian $DEB_CODENAME/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$MONGO_VER.gpg ] https://repo.mongodb.org/apt/debian $DEB_CODENAME/mongodb-org/$MONGO_VER main" | tee /etc/apt/sources.list.d/mongodb-org-$MONGO_VER.list
   fi
 
   apt-get update -y || true
