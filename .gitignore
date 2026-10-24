@@ -9,6 +9,7 @@ yarn-error.log*
 .wwebjs_cache/
 auth_info_baileys/
 session.json
+sessions.json
 
 # Environment & Credentials
 .env

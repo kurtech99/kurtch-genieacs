@@ -90,8 +90,48 @@ function sendTelegramMessage(botToken, chatId, text) {
 }
 
 
-const sessions = new Map();
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 hari
+const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 hari
+
+function loadSessionsFromDisk() {
+  const map = new Map();
+  try {
+    if (fs.existsSync(SESSIONS_FILE)) {
+      const content = fs.readFileSync(SESSIONS_FILE, 'utf8');
+      const data = JSON.parse(content || '{}');
+      const now = Date.now();
+      for (const [token, sess] of Object.entries(data)) {
+        if (sess && sess.expiresAt && sess.expiresAt > now) {
+          map.set(token, sess);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error loading sessions.json:', e.message);
+  }
+  return map;
+}
+
+const sessions = loadSessionsFromDisk();
+let sessionSaveTimeout = null;
+
+function saveSessionsToDisk() {
+  if (sessionSaveTimeout) clearTimeout(sessionSaveTimeout);
+  sessionSaveTimeout = setTimeout(() => {
+    try {
+      const obj = {};
+      const now = Date.now();
+      for (const [token, sess] of sessions.entries()) {
+        if (sess.expiresAt > now) {
+          obj[token] = sess;
+        }
+      }
+      fs.writeFileSync(SESSIONS_FILE, JSON.stringify(obj, null, 2), 'utf8');
+    } catch (e) {
+      console.error('Error writing sessions.json:', e.message);
+    }
+  }, 500);
+}
 
 function getSessionToken(req) {
   const cookieHeader = req.headers.cookie;
@@ -109,7 +149,14 @@ function isValidSession(req) {
   if (!sess) return false;
   if (Date.now() > sess.expiresAt) {
     sessions.delete(token);
+    saveSessionsToDisk();
     return false;
+  }
+  // Rolling session: perpanjang sesi 30 hari setiap ada interaksi aktif
+  const remaining = sess.expiresAt - Date.now();
+  if (remaining < SESSION_TTL_MS / 2) {
+    sess.expiresAt = Date.now() + SESSION_TTL_MS;
+    saveSessionsToDisk();
   }
   return true;
 }
@@ -128,6 +175,7 @@ function createSession(username) {
     createdAt: now,
     expiresAt: now + SESSION_TTL_MS
   });
+  saveSessionsToDisk();
   return token;
 }
 
@@ -135,6 +183,7 @@ function destroySession(req) {
   const token = getSessionToken(req);
   if (token) {
     sessions.delete(token);
+    saveSessionsToDisk();
   }
 }
 
@@ -353,7 +402,7 @@ const server = http.createServer(async (req, res) => {
 
     if (username === validUser && password === validPass) {
       const token = createSession(username);
-      const cookieVal = `acs_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 86400}`;
+      const cookieVal = `acs_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 86400}`;
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Set-Cookie': cookieVal

@@ -1076,21 +1076,23 @@ function switchHotspotTab(tab) {
 async function checkAuth() {
   try {
     const res = await fetch('/api/auth/me');
-    if (!res.ok) {
+    if (res.status === 401) {
       window.location.href = '/login.html';
       return;
     }
-    const data = await res.json();
-    if (!data.authenticated) {
-      window.location.href = '/login.html';
-      return;
-    }
-    const adminNameEl = document.getElementById('currentAdminName');
-    if (adminNameEl && data.user && data.user.username) {
-      adminNameEl.textContent = data.user.username;
+    if (res.ok) {
+      const data = await res.json();
+      if (data.authenticated === false) {
+        window.location.href = '/login.html';
+        return;
+      }
+      const adminNameEl = document.getElementById('currentAdminName');
+      if (adminNameEl && data.user && data.user.username) {
+        adminNameEl.textContent = data.user.username;
+      }
     }
   } catch (e) {
-    window.location.href = '/login.html';
+    console.warn('Cek auth tertunda (server sedang memuat ulang):', e.message);
   }
 }
 
