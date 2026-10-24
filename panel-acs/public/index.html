@@ -197,53 +197,7 @@
           </div>
         </div>
 
-        <!-- Section: Akun Member Free Hotspot (Bonus Internet) -->
-        <div class="form-group" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-bottom:0; color:#10b981; font-weight:600; user-select:none;">
-            <input type="checkbox" id="chkFreeHotspot" onchange="toggleHotspotFields()" style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
-            <span>🎁 Sertakan Akun Member Free Hotspot (Bonus Internet)</span>
-          </label>
-          
-          <div id="hotspotFieldsWrap" style="display:none; margin-top:12px; padding-top:12px; border-top:1px dashed rgba(16, 185, 129, 0.25);">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-              <div>
-                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:block;">Username Hotspot</label>
-                <input type="text" id="wifiHotspotUser" placeholder="Contoh: km_iqbal" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
-              </div>
-              <div>
-                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
-                  <span>Password Hotspot</span>
-                  <a href="javascript:void(0)" onclick="generateHotspotPass()" style="font-size:0.72rem; color:#34d399; text-decoration:none; font-weight:600;">🎲 Acak</a>
-                </label>
-                <input type="text" id="wifiHotspotPass" placeholder="Contoh: 1234" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
-              </div>
-            </div>
-            <div style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:10px; margin-bottom:10px;">
-              <div>
-                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
-                  <span>🏷️ Profile MikroTik Hotspot</span>
-                  <a href="javascript:void(0)" onclick="refreshMikrotikProfiles(true)" style="font-size:0.7rem; color:#38bdf8; text-decoration:none;">🔄 Refresh</a>
-                </label>
-                <select id="wifiHotspotProfile" style="padding:8px 10px; font-size:0.88rem; background:rgba(15, 23, 42, 0.85); color:#f8fafc; border:1px solid rgba(255,255,255,0.15); border-radius:6px; width:100%;">
-                  <option value="FREE Member" selected>FREE Member (1 Mbps - 1 HP)</option>
-                  <option value="FREE 2 HP">FREE 2 HP (5 Mbps - 2 HP)</option>
-                  <option value="FREE 4 HP">FREE 4 HP (5 Mbps - 4 HP)</option>
-                  <option value="default">default</option>
-                </select>
-              </div>
-              <div>
-                <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:block;">Catatan Hotspot</label>
-                <input type="text" id="wifiHotspotNote" placeholder="Keterangan voucher/titik" value="Bisa digunakan di seluruh titik Hotspot WiFi kami" style="padding:8px 10px; font-size:0.88rem; background:rgba(0,0,0,0.35);">
-              </div>
-            </div>
-            <div style="display:flex; align-items:flex-start; gap:6px; font-size:0.74rem; color:#34d399; background:rgba(16, 185, 129, 0.12); padding:8px 10px; border-radius:6px; border:1px solid rgba(16, 185, 129, 0.2);">
-              <span style="font-size:0.9rem; line-height:1;">⚡</span>
-              <div>
-                <strong>Auto-Sync MikroTik:</strong> User & password ini akan <strong>otomatis langsung terdaftar di Winbox MikroTik</strong> (<code>/ip hotspot user</code>) saat Anda klik Simpan atau Kirim via Bot WA!
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <div class="form-group">
           <label>Nomor WhatsApp Pelanggan</label>
