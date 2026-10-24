@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.7">
+  <link rel="stylesheet" href="style.css?v=3.0">
   <script>
     (function() {
       const savedTheme = localStorage.getItem('kurtech_theme') || 'dark';
@@ -484,34 +484,34 @@
           <form id="notificationConfigForm" onsubmit="saveNotificationSettings(event)">
             
             <!-- Gateway Channel Choice -->
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
-              <label style="display:block; margin-bottom:10px; font-weight:700; color:var(--text-main); font-size:0.95rem;">
+            <div class="subpanel-card notif-channel-box">
+              <label class="subpanel-title">
                 🎯 Pilih Saluran Bot Notifikasi:
               </label>
-              <div class="gateway-channel-pills" style="display:flex; gap:10px; flex-wrap:wrap;">
-                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(37,211,102,0.1); border:1px solid rgba(37,211,102,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+              <div class="gateway-channel-pills">
+                <label class="channel-pill-label channel-pill-wa">
                   <input type="radio" name="notifChannel" value="whatsapp" id="channelWa" onchange="updateChannelPanelsUI()">
-                  <span style="color:#25D366; font-weight:600; font-size:0.88rem;">📱 WhatsApp Bot Saja (Scan Barcode)</span>
+                  <span>📱 WhatsApp Bot Saja (Scan Barcode)</span>
                 </label>
-                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(0,112,243,0.1); border:1px solid rgba(0,112,243,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+                <label class="channel-pill-label channel-pill-tg">
                   <input type="radio" name="notifChannel" value="telegram" id="channelTg" onchange="updateChannelPanelsUI()">
-                  <span style="color:#93c5fd; font-weight:600; font-size:0.88rem;">✈️ Telegram Bot Saja</span>
+                  <span>✈️ Telegram Bot Saja</span>
                 </label>
-                <label class="channel-pill-label" style="display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(0,242,254,0.1); border:1px solid rgba(0,242,254,0.3); border-radius:var(--radius-sm); cursor:pointer;">
+                <label class="channel-pill-label channel-pill-both">
                   <input type="radio" name="notifChannel" value="both" id="channelBoth" checked onchange="updateChannelPanelsUI()">
-                  <span style="color:var(--primary-cyan); font-weight:600; font-size:0.88rem;">⚡ Keduanya Aktif (WA & Telegram)</span>
+                  <span>⚡ Keduanya Aktif (WA & Telegram)</span>
                 </label>
               </div>
             </div>
 
             <!-- WhatsApp Bot Subpanel -->
-            <div id="waSubpanel" style="background:rgba(37,211,102,0.04); border:1px solid rgba(37,211,102,0.22); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div id="waSubpanel" class="subpanel-card subpanel-wa">
+              <div class="subpanel-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:1.3rem;">📱</span>
                   <div>
-                    <strong style="color:#25D366; font-size:0.95rem;">Bot WhatsApp NOC (Scan Barcode)</strong>
-                    <div style="font-size:0.78rem; color:var(--text-muted);">Tautkan WhatsApp Anda seperti WhatsApp Web agar bot bisa mengirim pesan otomatis</div>
+                    <strong class="wa-title">Bot WhatsApp NOC (Scan Barcode)</strong>
+                    <div class="subpanel-desc">Tautkan WhatsApp Anda seperti WhatsApp Web agar bot bisa mengirim pesan otomatis</div>
                   </div>
                 </div>
                 <div id="waStatusBadge">
@@ -524,7 +524,7 @@
                 <button type="button" class="btn btn-sm btn-whatsapp" id="btnTriggerWaConnect" onclick="connectWhatsApp('qr')">
                   <span>📸 Tampilkan Barcode Baru</span>
                 </button>
-                <button type="button" class="btn btn-sm" id="btnTriggerWaCode" style="background:rgba(0,242,254,0.12); color:var(--primary-cyan); border:1px solid rgba(0,242,254,0.35);" onclick="requestWaPairingCode()">
+                <button type="button" class="btn btn-sm btn-pairing-code" id="btnTriggerWaCode" onclick="requestWaPairingCode()">
                   <span>🔢 Tautkan Pakai Kode 8-Digit</span>
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="checkWhatsAppStatus(true)">
@@ -533,45 +533,45 @@
               </div>
 
               <!-- Barcode QR View Box -->
-              <div id="waQrBox" style="display:none; text-align:center; padding:18px; background:rgba(0,0,0,0.5); border:1px dashed #25D366; border-radius:var(--radius-sm); margin-bottom:14px;">
-                <div style="font-size:0.88rem; color:var(--text-main); margin-bottom:10px; font-weight:600;">
+              <div id="waQrBox" class="wa-barcode-box" style="display:none;">
+                <div class="wa-barcode-title">
                   📸 Arahkan Kamera WhatsApp HP Anda ke Barcode Ini:
                 </div>
-                <div style="background:#ffffff; display:inline-block; padding:12px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
-                  <img id="waQrImage" src="" alt="Barcode WhatsApp" style="width:200px; height:200px; display:block;">
+                <div class="wa-barcode-img-wrap">
+                  <img id="waQrImage" src="" alt="Barcode WhatsApp">
                 </div>
-                <div style="margin-top:10px; font-size:0.8rem; color:#93c5fd;">
+                <div class="wa-barcode-steps">
                   Buka WhatsApp di HP &gt; Titik Tiga (atau Pengaturan) &gt; <strong>Perangkat Tertaut</strong> &gt; <strong>Tautkan Perangkat</strong>.
                 </div>
-                <div style="margin-top:4px; font-size:0.75rem; color:var(--text-muted);">
+                <div class="wa-barcode-note">
                   💡 <em>Jika kamera sulit scan, gunakan tombol <strong>"🔢 Tautkan Pakai Kode 8-Digit"</strong> di atas.</em>
                 </div>
               </div>
 
               <!-- Pairing Code View Box -->
-              <div id="waPairingBox" style="display:none; text-align:center; padding:18px; background:rgba(0,242,254,0.05); border:1px dashed var(--primary-cyan); border-radius:var(--radius-sm); margin-bottom:14px;">
-                <div style="font-size:0.88rem; color:var(--text-main); margin-bottom:8px; font-weight:600;">
+              <div id="waPairingBox" class="wa-pairing-box" style="display:none;">
+                <div class="wa-pairing-title">
                   🔢 Masukkan Kode Ini di WhatsApp HP Anda:
                 </div>
-                <div style="display:inline-flex; align-items:center; gap:10px; background:#070d18; border:1px solid var(--primary-cyan); padding:10px 18px; border-radius:8px; box-shadow:0 4px 16px rgba(0,242,254,0.15);">
-                  <span id="waPairingCodeDisplay" style="font-family:var(--font-mono); font-size:1.8rem; font-weight:800; letter-spacing:5px; color:#00f2fe;">---- - ----</span>
+                <div class="wa-pairing-code-wrap">
+                  <span id="waPairingCodeDisplay" class="pairing-code-display">---- - ----</span>
                   <button type="button" class="btn btn-sm btn-secondary" onclick="copyPairingCode()" title="Salin Kode">📋 Salin</button>
                 </div>
-                <div style="margin-top:12px; font-size:0.82rem; color:var(--text-main); line-height:1.5; text-align:left; max-width:440px; margin-left:auto; margin-right:auto;">
+                <div class="wa-pairing-steps">
                   <strong>Langkah di WhatsApp HP:</strong><br>
                   1. Buka WhatsApp di HP &gt; Titik Tiga / Pengaturan &gt; <strong>Perangkat Tertaut</strong><br>
                   2. Ketuk <strong>Tautkan Perangkat</strong><br>
-                  3. Pada bagian bawah layar HP, ketuk: <strong style="color:var(--primary-cyan);">"Tautkan dengan nomor telepon saja"</strong><br>
+                  3. Pada bagian bawah layar HP, ketuk: <strong>"Tautkan dengan nomor telepon saja"</strong><br>
                   4. Masukkan kode 8-digit di atas. Selesai!
                 </div>
               </div>
 
               <!-- Connected Account Info Box -->
-              <div id="waConnectedBox" style="display:none; padding:12px 14px; background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.25); border-radius:var(--radius-sm); margin-bottom:12px;">
+              <div id="waConnectedBox" class="wa-connected-box" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                   <div>
-                    <span style="color:#00e676; font-weight:700;">🟢 Terhubung sebagai:</span>
-                    <strong id="waConnectedPhone" style="color:var(--text-main); font-family:var(--font-mono); margin-left:6px;">+62 ...</strong>
+                    <span class="wa-conn-label">🟢 Terhubung sebagai:</span>
+                    <strong id="waConnectedPhone" class="wa-conn-phone">+62 ...</strong>
                   </div>
                   <button type="button" class="btn btn-sm btn-danger-soft" onclick="disconnectWhatsApp()">Putuskan Sesi WA</button>
                 </div>
@@ -588,12 +588,12 @@
             </div>
 
             <!-- Telegram Bot Subpanel -->
-            <div id="tgSubpanel" style="background:rgba(0,112,243,0.04); border:1px solid rgba(0,112,243,0.22); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+            <div id="tgSubpanel" class="subpanel-card subpanel-tg">
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
                 <span style="font-size:1.3rem;">✈️</span>
                 <div>
-                  <strong style="color:#93c5fd; font-size:0.95rem;">Bot Telegram (Opsional)</strong>
-                  <div style="font-size:0.78rem; color:var(--text-muted);">Gunakan Bot Telegram jika Anda ingin alert terkirim ke Grup Telegram NOC</div>
+                  <strong class="tg-title">Bot Telegram (Opsional)</strong>
+                  <div class="subpanel-desc">Gunakan Bot Telegram jika Anda ingin alert terkirim ke Grup Telegram NOC</div>
                 </div>
               </div>
 
@@ -617,36 +617,36 @@
             </div>
 
             <!-- Event Trigger Checkboxes -->
-            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px; background:rgba(0,0,0,0.25); padding:14px; border-radius:var(--radius-sm); border:1px solid rgba(255,255,255,0.05);">
-              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:var(--text-main);">
-                <input type="checkbox" id="alertLosInput" checked style="accent-color:var(--accent-red); width:18px; height:18px;">
+            <div class="subpanel-card subpanel-events">
+              <label class="event-checkbox-label">
+                <input type="checkbox" id="alertLosInput" checked class="accent-red">
                 <span>🚨 Kirim notifikasi NOC (Admin) jika Modem Mati / Kabel Putus (LOS) &gt; 10 menit</span>
               </label>
-              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:#25D366;">
-                <input type="checkbox" id="alertCustomerLosInput" checked style="accent-color:#25D366; width:18px; height:18px;">
+              <label class="event-checkbox-label event-customer-wa">
+                <input type="checkbox" id="alertCustomerLosInput" checked class="accent-green">
                 <span>📲 <strong>Kirim pesan otomatis ke WhatsApp Pelanggan</strong> saat modem mereka mati/LOS &gt; 10 menit (dan pesan saat online kembali)</span>
               </label>
-              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.88rem; color:var(--text-main);">
-                <input type="checkbox" id="alertRxInput" checked style="accent-color:var(--accent-yellow); width:18px; height:18px;">
+              <label class="event-checkbox-label">
+                <input type="checkbox" id="alertRxInput" checked class="accent-yellow">
                 <span>⚠️ Kirim notifikasi NOC (Admin) jika Redaman Optik Kritis (&le; -27 dBm)</span>
               </label>
             </div>
 
             <!-- Section: Custom Template Pesan Ganti Wi-Fi (WhatsApp) -->
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
-                <label style="margin-bottom:0; font-weight:700; color:var(--text-main); font-size:0.95rem;">
+            <div class="subpanel-card subpanel-template">
+              <div class="template-header">
+                <label class="subpanel-title" style="margin-bottom:0;">
                   📝 Custom Template Pesan WhatsApp Ganti Wi-Fi
                 </label>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="resetWifiMsgTemplate()" style="font-size:0.75rem; padding:3px 9px;">
                   🔄 Reset ke Default
                 </button>
               </div>
-              <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">
+              <p class="subpanel-desc" style="margin-bottom:10px;">
                 Sesuaikan kata-kata pesan WhatsApp yang otomatis terkirim ke nomor pelanggan saat mengubah SSID atau password Wi-Fi.
               </p>
-              <textarea id="wifiMsgTemplateInput" rows="7" style="width:100%; padding:10px 12px; font-family:var(--font-sans); font-size:0.86rem; border-radius:6px; border:1px solid var(--border-color); background:rgba(0,0,0,0.35); color:var(--text-main); line-height:1.5; resize:vertical;" placeholder="Tulis template pesan di sini..."></textarea>
-              <div style="margin-top:8px; font-size:0.76rem; color:#93c5fd; background:rgba(0,112,243,0.08); padding:8px 12px; border-radius:6px; border:1px solid rgba(0,112,243,0.2); line-height:1.6;">
+              <textarea id="wifiMsgTemplateInput" class="template-textarea" rows="7" placeholder="Tulis template pesan di sini..."></textarea>
+              <div class="template-tags-helper">
                 <strong>Tag / Variabel yang Otomatis Terisi:</strong><br>
                 <code>{nama}</code> = Nama Pelanggan &bull; 
                 <code>{ssid}</code> = Nama Wi-Fi Baru &bull; 
