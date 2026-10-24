@@ -1275,8 +1275,7 @@ const server = http.createServer(async (req, res) => {
     const cfg = loadConfig();
     const notif = cfg.notifications || {};
     const tg = cfg.telegram || notif.telegram || {};
-    const waCfg = notif.whatsapp || {};
-
+    if (req.method === 'GET') {
       const defaultTpl = `Halo Bapak/Ibu *{nama}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* {ssid}\n🔑 *Password Wi-Fi:* {password}\n{catatan}\n\nSilakan sambungkan kembali HP atau laptop Anda dengan password di atas.\n\nTerima kasih telah berlangganan layanan *{brand}*!`;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({
