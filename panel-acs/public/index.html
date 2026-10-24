@@ -632,6 +632,30 @@
               </label>
             </div>
 
+            <!-- Section: Custom Template Pesan Ganti Wi-Fi (WhatsApp) -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                <label style="margin-bottom:0; font-weight:700; color:var(--text-main); font-size:0.95rem;">
+                  📝 Custom Template Pesan WhatsApp Ganti Wi-Fi
+                </label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="resetWifiMsgTemplate()" style="font-size:0.75rem; padding:3px 9px;">
+                  🔄 Reset ke Default
+                </button>
+              </div>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">
+                Sesuaikan kata-kata pesan WhatsApp yang otomatis terkirim ke nomor pelanggan saat mengubah SSID atau password Wi-Fi.
+              </p>
+              <textarea id="wifiMsgTemplateInput" rows="7" style="width:100%; padding:10px 12px; font-family:var(--font-sans); font-size:0.86rem; border-radius:6px; border:1px solid var(--border-color); background:rgba(0,0,0,0.35); color:var(--text-main); line-height:1.5; resize:vertical;" placeholder="Tulis template pesan di sini..."></textarea>
+              <div style="margin-top:8px; font-size:0.76rem; color:#93c5fd; background:rgba(0,112,243,0.08); padding:8px 12px; border-radius:6px; border:1px solid rgba(0,112,243,0.2); line-height:1.6;">
+                <strong>Tag / Variabel yang Otomatis Terisi:</strong><br>
+                <code>{nama}</code> = Nama Pelanggan &bull; 
+                <code>{ssid}</code> = Nama Wi-Fi Baru &bull; 
+                <code>{password}</code> = Password Wi-Fi &bull; 
+                <code>{brand}</code> = Nama Brand/Usaha Anda &bull; 
+                <code>{catatan}</code> = Catatan tambahan jika sandi tidak diubah
+              </div>
+            </div>
+
             <div class="modal-footer" style="padding: 16px 0 0 0; margin-top: 16px; display:flex; justify-content:flex-end;">
               <button type="submit" class="btn btn-primary" id="btnSaveNotifications">
                 <span>Simpan Pengaturan Notifikasi</span>

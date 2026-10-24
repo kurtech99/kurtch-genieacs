@@ -1249,18 +1249,21 @@ const server = http.createServer(async (req, res) => {
     }
 
     const passText = (password && password.trim()) ? password.trim() : '(Tetap sesuai sandi lama yang terpasang di modem Anda)';
+    const catatanSandiLama = (!password || !password.trim()) ? `\n_(Catatan: Sandi Wi-Fi tetap memakai sandi lama di modem Anda. Jika ingin mengganti sandi baru, silakan hubungi admin kami)._` : '';
 
-    let text = `Halo Bapak/Ibu *${clientName}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* ${ssid || '-'}\n🔑 *Password Wi-Fi:* ${passText}`;
+    const defaultTpl = `Halo Bapak/Ibu *{nama}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* {ssid}\n🔑 *Password Wi-Fi:* {password}\n{catatan}\n\nSilakan sambungkan kembali HP atau laptop Anda dengan password di atas.\n\nTerima kasih telah berlangganan layanan *{brand}*!`;
+    const cfgNow = loadConfig();
+    const rawTemplate = cfgNow.notifications?.wifiMsgTemplate || cfgNow.wifiMsgTemplate || defaultTpl;
 
-    if (includeHotspot) {
-      text += `\n\n🎁 *BONUS AKUN FREE HOTSPOT:*\n👤 *Username:* ${hotspotUser || '-'}\n🔒 *Password:* ${hotspotPass || '-'}\n📌 *Keterangan:* ${hotspotNote || 'Bisa digunakan di seluruh titik Hotspot WiFi kami'}`;
-    }
+    let text = rawTemplate
+      .replace(/{nama}|{name}/gi, clientName)
+      .replace(/{ssid}/gi, ssid || '-')
+      .replace(/{password}|{pass}/gi, passText)
+      .replace(/{brand}/gi, brandName)
+      .replace(/{catatan}/gi, catatanSandiLama);
 
-    if (!password || !password.trim()) {
-      text += `\n\n_(Catatan: Sandi Wi-Fi tetap memakai sandi lama di modem Anda. Jika ingin mengganti sandi baru, silakan hubungi admin kami)._`;
-    }
-
-    text += `\n\nSilakan hubungkan perangkat Anda. Terima kasih telah berlangganan layanan *${brandName}*!`;
+    // Bersihkan baris kosong berlebih
+    text = text.replace(/\n{3,}/g, '\n\n').trim();
 
     const sendRes = await wa.sendWhatsAppMessage(phone.trim(), text);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1274,12 +1277,13 @@ const server = http.createServer(async (req, res) => {
     const tg = cfg.telegram || notif.telegram || {};
     const waCfg = notif.whatsapp || {};
 
-    if (req.method === 'GET') {
+      const defaultTpl = `Halo Bapak/Ibu *{nama}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* {ssid}\n🔑 *Password Wi-Fi:* {password}\n{catatan}\n\nSilakan sambungkan kembali HP atau laptop Anda dengan password di atas.\n\nTerima kasih telah berlangganan layanan *{brand}*!`;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({
         success: true,
         channel: notif.channel || 'telegram', // 'telegram' | 'whatsapp' | 'both'
         adminPhone: notif.adminPhone || '',
+        wifiMsgTemplate: notif.wifiMsgTemplate || cfg.wifiMsgTemplate || defaultTpl,
         telegram: {
           enabled: Boolean(tg.enabled),
           botToken: tg.botToken || '',
@@ -1311,6 +1315,7 @@ const server = http.createServer(async (req, res) => {
 
       const channel = body.channel || 'telegram';
       const adminPhone = (body.adminPhone && body.adminPhone.trim()) || '';
+      const wifiMsgTemplate = (typeof body.wifiMsgTemplate === 'string') ? body.wifiMsgTemplate : undefined;
 
       const tgData = {
         enabled: Boolean(body.telegram?.enabled ?? body.enabled),
@@ -1330,9 +1335,11 @@ const server = http.createServer(async (req, res) => {
       cfg.notifications = {
         channel,
         adminPhone,
+        wifiMsgTemplate: wifiMsgTemplate !== undefined ? wifiMsgTemplate : (cfg.notifications?.wifiMsgTemplate || cfg.wifiMsgTemplate),
         telegram: tgData,
         whatsapp: waData
       };
+      if (wifiMsgTemplate !== undefined) cfg.wifiMsgTemplate = wifiMsgTemplate;
       cfg.telegram = tgData;
 
       saveConfig(cfg);

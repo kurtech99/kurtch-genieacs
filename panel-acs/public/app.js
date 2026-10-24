@@ -1532,18 +1532,20 @@ function shareWifiToWhatsApp() {
   const brandName = (currentBrand && currentBrand.name) ? currentBrand.name : 'NOC PANEL';
 
   const passText = (password && password.trim()) ? password.trim() : '(Tetap sesuai sandi lama yang terpasang di modem Anda)';
+  const catatanSandiLama = (!password || !password.trim()) ? `\n_(Catatan: Sandi Wi-Fi tetap memakai sandi lama di modem Anda. Jika ingin mengganti sandi baru, silakan hubungi admin kami)._` : '';
 
-  let text = `Halo Bapak/Ibu *${clientName}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* ${ssid || '-'}\n🔑 *Password Wi-Fi:* ${passText}`;
+  const defaultTpl = `Halo Bapak/Ibu *{nama}*,\n\nBerikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:\n\n📶 *Nama Wi-Fi (SSID):* {ssid}\n🔑 *Password Wi-Fi:* {password}\n{catatan}\n\nSilakan sambungkan kembali HP atau laptop Anda dengan password di atas.\n\nTerima kasih telah berlangganan layanan *{brand}*!`;
+  const tplInput = document.getElementById('wifiMsgTemplateInput')?.value.trim();
+  const rawTemplate = cachedWifiMsgTemplate || tplInput || defaultTpl;
 
-  if (includeHotspot) {
-    text += `\n\n🎁 *BONUS AKUN FREE HOTSPOT:*\n👤 *Username:* ${hotspotUser || '-'}\n🔒 *Password:* ${hotspotPass || '-'}\n🏷️ *Profile:* ${hotspotProfile}\n📌 *Keterangan:* ${hotspotNote || 'Bisa digunakan di seluruh titik Hotspot WiFi kami'}`;
-  }
+  let text = rawTemplate
+    .replace(/{nama}|{name}/gi, clientName)
+    .replace(/{ssid}/gi, ssid || '-')
+    .replace(/{password}|{pass}/gi, passText)
+    .replace(/{brand}/gi, brandName)
+    .replace(/{catatan}/gi, catatanSandiLama);
 
-  if (!password || !password.trim()) {
-    text += `\n\n_(Catatan: Sandi Wi-Fi tetap memakai sandi lama di modem Anda. Jika ingin mengubah sandi baru, silakan hubungi admin kami)._`;
-  }
-
-  text += `\n\nSilakan hubungkan perangkat Anda. Terima kasih telah berlangganan layanan *${brandName}*!`;
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
 
   let cleanPhone = phone.replace(/[^0-9]/g, '');
   if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
@@ -1962,6 +1964,28 @@ function updateChannelPanelsUI() {
   }
 }
 
+const DEFAULT_WIFI_TEMPLATE = `Halo Bapak/Ibu *{nama}*,
+
+Berikut adalah rincian informasi koneksi internet dan Wi-Fi Anda:
+
+📶 *Nama Wi-Fi (SSID):* {ssid}
+🔑 *Password Wi-Fi:* {password}
+{catatan}
+
+Silakan sambungkan kembali HP atau laptop Anda dengan password di atas.
+
+Terima kasih telah berlangganan layanan *{brand}*!`;
+
+let cachedWifiMsgTemplate = '';
+
+function resetWifiMsgTemplate() {
+  const input = document.getElementById('wifiMsgTemplateInput');
+  if (input) {
+    input.value = DEFAULT_WIFI_TEMPLATE;
+    showToast('Template di-reset ke default. Klik "Simpan Pengaturan Notifikasi" untuk menyimpan!', 'info');
+  }
+}
+
 async function loadNotificationSettings() {
   try {
     const res = await fetch('/api/notifications/config');
@@ -1970,6 +1994,12 @@ async function loadNotificationSettings() {
       const ch = data.channel || 'both';
       const radio = document.querySelector(`input[name="notifChannel"][value="${ch}"]`);
       if (radio) radio.checked = true;
+
+      cachedWifiMsgTemplate = data.wifiMsgTemplate || '';
+      const tplInput = document.getElementById('wifiMsgTemplateInput');
+      if (tplInput) {
+        tplInput.value = data.wifiMsgTemplate || DEFAULT_WIFI_TEMPLATE;
+      }
 
       document.getElementById('waAdminPhoneInput').value = data.adminPhone || '';
       document.getElementById('tgTokenInput').value = data.telegram?.botToken || '';
@@ -1997,6 +2027,7 @@ async function saveNotificationSettings(e) {
 
   const channel = document.querySelector('input[name="notifChannel"]:checked')?.value || 'both';
   const adminPhone = document.getElementById('waAdminPhoneInput').value.trim();
+  const wifiMsgTemplate = document.getElementById('wifiMsgTemplateInput')?.value || DEFAULT_WIFI_TEMPLATE;
   const botToken = document.getElementById('tgTokenInput').value.trim();
   const chatId = document.getElementById('tgChatIdInput').value.trim();
   const alertLos = document.getElementById('alertLosInput').checked;
@@ -2010,13 +2041,15 @@ async function saveNotificationSettings(e) {
       body: JSON.stringify({
         channel,
         adminPhone,
+        wifiMsgTemplate,
         telegram: { enabled: channel !== 'whatsapp', botToken, chatId, alertLos, alertRedaman },
         whatsapp: { enabled: channel !== 'telegram', alertLos, alertRedaman, notifyCustomerLos: alertCustomerLos }
       })
     });
     const data = await res.json();
     if (data.success) {
-      showToast('✅ Pengaturan notifikasi berhasil disimpan!', 'success');
+      cachedWifiMsgTemplate = wifiMsgTemplate;
+      showToast('✅ Pengaturan notifikasi & template pesan berhasil disimpan!', 'success');
     } else {
       showToast('Gagal: ' + (data.message || 'Error simpan'), 'error');
     }
